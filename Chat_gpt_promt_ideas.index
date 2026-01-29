@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHAT GPT PROMTU IDEJAS - 61 DARBĪBA</title>
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --text-main: #1e293b;
+            --text-muted: #94a3b8;
+            --item-bg: rgba(255, 255, 255, 0.35);
+            --item-active: #ffffff;
+            --card-p-top-bottom: 35px;
+            --card-p-right: 30px;
+            --card-p-left: 55px; 
+            --item-padding: 20px; 
+            --star-color: #fb1;
+        }
+
+        [data-theme="dark"] {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f1f5f9;
+            --text-muted: #64748b;
+            --item-bg: rgba(255, 255, 255, 0.05);
+            --item-active: rgba(255, 255, 255, 0.12);
+        }
+
+        body {
+            margin: 0; padding: 20px 10px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg-gradient); min-height: 100vh;
+            display: flex; justify-content: center; transition: background 0.4s ease;
+        }
+
+        .card {
+            background: var(--glass-bg); backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border); border-radius: 30px;
+            padding: var(--card-p-top-bottom) var(--card-p-right) var(--card-p-top-bottom) var(--card-p-left);
+            width: 95%; max-width: 500px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            position: relative; box-sizing: border-box;
+        }
+
+        .controls { position: absolute; top: 15px; right: 15px; display: flex; flex-direction: column; gap: 10px; z-index: 10; }
+        .icon-btn { cursor: pointer; font-size: 1.1rem; opacity: 0.5; transition: 0.2s; user-select: none; }
+        .icon-btn:hover { opacity: 1; }
+
+        h2 { 
+            text-align: center; font-weight: 400; margin-bottom: 35px;
+            margin-left: calc((var(--card-p-left) - var(--card-p-right)) * -1);
+            text-transform: uppercase; font-size: 1.1rem; letter-spacing: 1.5px;
+            color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+
+        .group { margin-bottom: 22px; }
+        label { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; display: block; }
+        
+        select {
+            width: 100%; padding: 8px 0; border: none; border-bottom: 1px solid var(--text-muted);
+            background: transparent; font-size: 1rem; color: var(--text-main); outline: none;
+            cursor: pointer; appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right center; background-size: 12px;
+        }
+
+        .prompt-row { display: flex; align-items: flex-start; margin-bottom: 12px; position: relative; }
+        .prompt-num-fixed { width: 30px; position: absolute; left: -38px; top: var(--item-padding); font-size: 0.95rem; color: var(--text-muted); text-align: right; }
+
+        .prompt-item {
+            flex: 1; background: var(--item-bg); border: 1px solid var(--glass-border);
+            border-radius: 18px; padding: var(--item-padding); cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-left: calc(var(--item-padding) * -1); overflow: hidden; position: relative;
+        }
+
+        .prompt-content {
+            font-size: 0.9rem; line-height: 1.6; color: var(--text-main);
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+            overflow: hidden; transition: all 0.3s ease; padding-right: 25px;
+            white-space: pre-wrap;
+        }
+
+        .prompt-item.active { background: var(--item-active); box-shadow: 0 8px 20px rgba(0,0,0,0.05); }
+        .prompt-item.active .prompt-content { display: block; -webkit-line-clamp: unset; overflow: visible; padding-bottom: 30px; }
+
+        .copy-btn {
+            position: absolute; top: 15px; right: 15px; background: transparent; border: none;
+            cursor: pointer; padding: 5px; display: none; opacity: 0.4; transition: 0.2s;
+        }
+        .prompt-item.active .copy-btn { display: block; }
+        .copy-btn:hover { opacity: 1; transform: scale(1.1); }
+        .copy-btn svg { width: 16px; height: 16px; fill: var(--text-muted); }
+
+        .copy-feedback {
+            position: absolute; top: 15px; right: 40px; font-size: 0.65rem;
+            color: #10b981; font-weight: bold; opacity: 0; transition: 0.3s;
+        }
+
+        .rating { position: absolute; bottom: 12px; right: 15px; display: none; gap: 4px; }
+        .prompt-item.active .rating { display: flex; }
+        .star { font-size: 1.2rem; color: var(--text-muted); opacity: 0.3; cursor: pointer; transition: 0.2s; }
+        .star.filled { color: var(--star-color); opacity: 1; }
+    </style>
+</head>
+<body data-theme="light">
+    <div class="card">
+        <div class="controls">
+            <div id="soundToggle" class="icon-btn" onclick="toggleSound()">🔊</div>
+            <div id="themeToggle" class="icon-btn" onclick="toggleTheme()">🌙</div>
+        </div>
+        <h2>✏️ CHAT GPT PROMTI (61)</h2>
+        
+        <div class="group">
+            <label>Tēma</label>
+            <select id="topicSelect" onchange="updateActions()"></select>
+        </div>
+        
+        <div class="group">
+            <label>Darbība</label>
+            <select id="actionSelect" onchange="displayPrompts()"></select>
+        </div>
+
+        <div id="promptContainer"></div>
+    </div>
+
+<script>
+    let audioCtx = null;
+    let isSoundEnabled = true;
+
+    const data = {
+        "Informācijas iegūšana un analīze": {
+            darbibas: {
+                "Atrast informāciju internetā": [
+                    { body: "Pārbaudi internetā aktuālo informāciju par šo tēmu un sniedz atbildi ar avotu norādēm." },
+                    { body: "Atrodi internetā jaunākos datus par šo jautājumu un apkopo tos kopsavilkumā." },
+                    { body: "Veic interneta meklēšanu par šo tematu un salīdzini informāciju no vairākiem avotiem." },
+                    { body: "Atrodi publiski pieejamu informāciju internetā par šo tēmu un izcel būtiskāko." },
+                    { body: "Pārbaudi šo faktu internetā un norādi, vai informācija ir apstiprināma ar uzticamiem avotiem." }
+                ],
+                "Apkopot informāciju": [
+                    { body: "Izveido kopsavilkumu par šo informāciju 5–7 teikumos." },
+                    { body: "Sagatavo tēzes par šo saturu, izceļot galvenās domas punktos." },
+                    { body: "Apkopot šo informāciju tabulā ar kolonnām: Temats, Galvenais, Piezīmes." },
+                    { body: "Izveido gan kopsavilkumu, gan tēzes, lai varu izvēlēties piemērotāko formātu." },
+                    { body: "Sakārto šo informāciju strukturētā tabulā un pievieno īsu secinājumu." }
+                ],
+                "Paskaidrot un vienkāršot": [
+                    { body: "Paskaidro šo informāciju vienkāršā valodā, it kā lasītājs par tēmu neko iepriekš nezinātu, un pievieno konkrētus ikdienas piemērus." },
+                    { body: "Vienkāršo tekstu, saglabājot galveno domu, un paskaidro katru būtisko jēdzienu ar īsu piemēru." },
+                    { body: "Izskaidro informāciju soli pa solim un pēc katra soļa pievieno praktisku piemēru." },
+                    { body: "Pārraksti šo informāciju saprotamā formā un ilustrē to ar vismaz diviem piemēriem no reālās dzīves." },
+                    { body: "Izskaidro šo tēmu bērnam vai iesācējam, izmantojot vienkāršus salīdzinājumus un piemērus." }
+                ],
+                "Salīdzināt informāciju": [
+                    { body: "Salīdzini šīs divas informācijas vienības, izceļot galvenās līdzības un atšķirības." },
+                    { body: "Veic salīdzinājumu starp šīm idejām, koncentrējoties uz mērķi, priekšrocībām un trūkumiem." },
+                    { body: "Salīdzini šīs pieejas pēc efektivitātes, sarežģītības un piemērotības dažādām situācijām." },
+                    { body: "Salīdzini šos produktus pēc funkcionalitātes, ceny un lietošanas ērtuma." },
+                    { body: "Salīdzini šos dokumentus pēc struktūras, satura un skaidrības." }
+                ],
+                "Izgūt specifiskus datus": [
+                    { body: "No šī teksta izvelc visus minētos datumus un uzskaiti tos atsevišķi." },
+                    { body: "Identificē tekstā visas personas, organizācijas vai vietas un uzraksti tās sarakstā." },
+                    { body: "Izgūt visus skaitliskos datus no teksta un norādi, uz ko katrs skaitlis attiecas." },
+                    { body: "No teksta izvelc visus nosacījumus, prasības vai ierobežojumus." },
+                    { body: "Izgūt galvenos faktus no teksta un strukturē tos atsevišķos punktos." }
+                ],
+                "Analizēt mājaslapas": [
+                    { body: "Analizē šīs publiski pieejamās mājaslapas saturu un sniedz kopsavilkumu par galvenajām tēmām un vēstījumu. Saite: [ielīmē saiti]" },
+                    { body: "Izvērtē mājaslapas saturu, koncentrējoties uz mērķauditoriju, galveno piedāvājumu un galvenajiem ieguvumiem. Saite: [ielīmē saiti]" },
+                    { body: "Analizē dotās mājaslapas tekstu no skaidrības, struktūras un loģikas viedokļa. Saite: [ielīmē saiti]" },
+                    { body: "Izanalizē mājaslapas saturu un izcel galvenos faktus, apgalvojumus un solījumus. Saite: [ielīmē saiti]" },
+                    { body: "Analizē mājaslapas saturu un paskaidro, kāds ir tās galvenais mērķis. Saite: [ielīmē saiti]" }
+                ],
+                "Analizēt dokumentus": [
+                    { body: "Izlasi pievienoto dokumentu un sagatavo kopsavilkumu par galveno saturu un secinājumiem." },
+                    { body: "Analizē pievienoto failu un izcel svarīgākos faktus, datus vai apgalvojumus." },
+                    { body: "Izlasi dokumentu un identificē galvenās tēmas, struktūru un mērķi." },
+                    { body: "No pievienotā dokumenta izvelc būtiskos datus un strukturē tos saprotamā formā." },
+                    { body: "Izanalizē pievienoto dokumentu un norādi iespējamos riskus, nepilnības vai neskaidrības." }
+                ],
+                "Izmantot konektorus": [
+                    { body: "Izlasi informāciju no pieslēgtā konektora un sagatavo kopsavilkumu par galveno saturu." },
+                    { body: "Izmanto pieejamo konektoru, lai izgūtu aktuālos datus, un strukturē tos saprotamā veidā." },
+                    { body: "Analizē informāciju no konektora un izcel būtiskākos faktus, izmaiņas vai tendences." },
+                    { body: "No konektora nolasīto informāciju salīdzini ar iepriekš pieejamiem datiem." },
+                    { body: "Izgūt no konektora tikai tos datus, kas attiecas uz norādīto tēmu." }
+                ],
+                "Identificēt riskus": [
+                    { body: "Izanalizē šo informāciju un identificē vietas, kur trūkst datu, skaidrojumu vai pierādījumu." },
+                    { body: "Pārbaudi tekstu un norādi iespējamās pretrunas starp apgalvojumiem vai faktiem." },
+                    { body: "Izvērtē sniegto informāciju un identificē potenciālos riskus." },
+                    { body: "Analizē informāciju kritiski un izcel pieņēmumus, kas nav pietiekami pamatoti." },
+                    { body: "Norādi, kuras teksta daļas var radīt pārpratumus vai kļūdainus secinājumus." }
+                ],
+                "Pārbaudīt loģiku": [
+                    { body: "Izanalizē šo tekstu un pārbaudi, vai secinājumi loģiski izriet no sniegtajiem faktiem." },
+                    { body: "Pārbaudi informācijas loģisko konsekvenci un norādi vietas, kur argumentācija pārtrūkst." },
+                    { body: "Izvērtē datus un pārbaudi, vai tie savstarpēji nav pretrunā." },
+                    { body: "Analizē teksta loģisko struktūru un norādi, kur pārejas starp idejām nav pamatotas." },
+                    { body: "Pārbaudi, vai izmantotie pieņēmumi atbilst turpmākajiem apgalvojumiem." }
+                ]
+            }
+        },
+        "Tekstu rakstīšana un valoda": {
+            darbibas: {
+                "Rakstīt tekstu": [
+                    { body: "Uzraksti informatīvu tekstu par doto tēmu, skaidri izklāstot galvenās idejas." },
+                    { body: "Uzraksti strukturētu tekstu par šo tēmu ar ievadu, galveno daļu un noslēgumu." },
+                    { body: "Uzraksti īsu pārskata tekstu par doto tēmu, paredzētu plašai auditorijai." },
+                    { body: "Uzraksti detalizētu skaidrojumu par šo tēmu, izmantojot vienkāršu valodu." },
+                    { body: "Uzraksti tekstu par doto tēmu, pielāgojot to noteiktam stilam vai mērķauditorijai." }
+                ],
+                "Saīsināt tekstu": [
+                    { body: "Saīsini šo tekstu, saglabājot galveno domu un būtiskāko informāciju." },
+                    { body: "Izveido īsu kopsavilkumu no šī teksta, neiekļaujot detaļas." },
+                    { body: "Saīsini tekstu līdz dažiem teikumiem, nezaudējot nozīmi." },
+                    { body: "Pārraksti šo tekstu koncentrētākā formā, saglabājot galvenos faktus." },
+                    { body: "Saīsini tekstu, padarot to skaidru un viegli uztveramu." }
+                ],
+                "Paplašināt tekstu": [
+                    { body: "Paplašini šo tekstu, pievienojot skaidrojumus un detaļas par galvenajām idejām." },
+                    { body: "Paplašini tekstu, attīstot katru minēto punktu ar piemēriem." },
+                    { body: "Pārraksti šo tekstu izvērstākā formā, saglabājot sākotnējo domu." },
+                    { body: "Paplašini tekstu, padarot to informatīvāku un strukturētāku." },
+                    { body: "Paplašini tekstu, pielāgojot to noteiktai mērķauditorijai." }
+                ],
+                "Uzlabot un rediģēt": [
+                    { body: "Uzlabo šo tekstu, padarot to skaidrāku, loģiskāku un vieglāk uztveramu." },
+                    { body: "Rediģē tekstu, izlabojot valodas, stila un struktūras kļūdas." },
+                    { body: "Pārraksti tekstu profesionālākā stilā, saglabājot tā nozīmi." },
+                    { body: "Uzlabo teksta plūdumu un sakārto domas loģiskā secībā." },
+                    { body: "Rediģē tekstu, saīsinot lieko un izceļot būtiskāko." }
+                ],
+                "Rakstīt stilā un tonī": [
+                    { body: "Uzraksti šo tekstu formālā un neitrālā tonī." },
+                    { body: "Pārraksti tekstu draudzīgā un sarunvalodīgā stilā." },
+                    { body: "Uzraksti tekstu profesionālā balsī, paredzētu biznesa auditorijai." },
+                    { body: "Pārraksti tekstu radošā un iedvesmojošā stilā." },
+                    { body: "Uzraksti tekstu tā, it kā to teiktu eksperts ar ilggadēju pieredzi." }
+                ],
+                "Zīmola stils": [
+                    { body: "Pārraksti šo tekstu, ievērojot pievienotā zīmola stilu un vadlīnijas." },
+                    { body: "Uzraksti tekstu korporatīvā stilā, balstoties uz doto piemēru." },
+                    { body: "Pielāgo šo tekstu uzņēmuma komunikācijas tonim, saglabājot zīmola balsi." },
+                    { body: "Rediģē tekstu tā, lai tas atbilstu dotajam zīmola stilam." },
+                    { body: "Izmanto pievienoto paraugu kā atsauci un uzraksti jaunu tekstu tādā pašā stilā." }
+                ],
+                "Sagatavot pēc parauga": [
+                    { body: "Sagatavo šo informāciju, izmantojot doto paraugu kā struktūras pamatu." },
+                    { body: "Pārkārto un noformē informāciju atbilstoši pievienotajai struktūrai." },
+                    { body: "Izmanto šo paraugu un aizpildi to ar sniegto informāciju." },
+                    { body: "Pielāgo informāciju dotajai struktūrai, nemainot satura nozīmi." },
+                    { body: "Sagatavo jaunu saturu, stingri ievērojot norādīto struktūru un secību." }
+                ],
+                "Noformēt un strukturēt": [
+                    { body: "Noformē šo informāciju skaidri strukturētā veidā ar virsrakstiem." },
+                    { body: "Sakārto informāciju loģiskā secībā un sadali pārskatāmās sadaļās." },
+                    { body: "Strukturē šo saturu tā, lai tas būtu viegli lasāms un saprotams." },
+                    { body: "Noformē informāciju ar skaidru hierarhiju, izceļot galveno." },
+                    { body: "Pārveido šo informāciju strukturētā formā, izmantojot sarakstus." }
+                ],
+                "Tulkot tekstu": [
+                    { body: "Iztulko šo tekstu no latviešu valodas uz angļu valodu." },
+                    { body: "Iztulko tekstu uz norādīto valodu, saglabājot nozīmi un stilu." },
+                    { body: "Pārtulko šo tekstu, pielāgojot to mērķauditorijai citā valodā." },
+                    { body: "Iztulko tekstu precīzi, neinterpretējot saturu." },
+                    { body: "Iztulko šo tekstu un, ja nepieciešams, paskaidro būtiskos terminus." }
+                ],
+                "Skaidrot kļūdas": [
+                    { body: "Izanalizē šo tekstu un paskaidro, kāpēc tajā ir radušās kļūdas." },
+                    { body: "Skaidro, kādi loģiskie trūkumi vai pretrunas ir šajā argumentācijā." },
+                    { body: "Norādi kļūdu cēloņus un paskaidro, kāpēc secinājumi nav pamatoti." },
+                    { body: "Izvērtē tekstu un izskaidro, kur un kāpēc ir pārkāpta loģiskā secība." },
+                    { body: "Paskaidro kļūdu iemeslus datos vai tekstā un ierosini novēršanu." }
+                ],
+                "Instrukcijas un politikas": [
+                    { body: "Uzraksti skaidras un strukturētas instrukcijas par šo procesu, paredzētas iesācējiem." },
+                    { body: "Sagatavo politikas dokumenta tekstu par doto tēmu, izmantojot formālu valodu." },
+                    { body: "Uzraksti produkta vai pakalpojuma aprakstu, izceļot galvenās īpašības." },
+                    { body: "Izveido prezentācijas tekstu ar īsiem, kodolīgiem punktiem katram slaidam." },
+                    { body: "Uzraksti soli pa solim aprakstu par doto uzdevumu vienkāršā valodā." }
+                ],
+                "Pielāgot auditorijai": [
+                    { body: "Pārraksti šo tekstu tā, lai tas būtu saprotams bērniem." },
+                    { body: "Pielāgo tekstu profesionālai auditorijai, izmantojot formālu valodu." },
+                    { body: "Uzraksti šo tekstu klientiem draudzīgā un saprotamā stilā." },
+                    { body: "Pārveido tekstu vadības komandai, koncentrējoties uz secinājumiem." },
+                    { body: "Pielāgo tekstu iesācējiem, izvairoties no tehniskiem terminiem." }
+                ],
+                "Gramatika un kvalitāte": [
+                    { body: "Pārbaudi šo tekstu un izlabojiet gramatikas, pareizrakstības kļūdas." },
+                    { body: "Izvērtē teksta valodas kvalitāti un ierosini uzlabojumus stilam." },
+                    { body: "Rediģē tekstu, lai tas būtu valodiski korekts un plūstošs." },
+                    { body: "Pārbaudi, vai teksts atbilst izvēlētajam stilam un tonim." },
+                    { body: "Izlabo valodas kļūdas un uzlabo teksta lasāmību." }
+                ],
+                "Mainīt teksta formu": [
+                    { body: "Pārvērt šo e-pasta tekstu strukturētā instrukcijā ar skaidriem soļiem." },
+                    { body: "Pārveido šo tekstu par prezentācijas saturu ar īsiem punktiem." },
+                    { body: "Pārraksti šo aprakstu kontrolsaraksta formā." },
+                    { body: "Pārvērt šo garo tekstu kopsavilkuma punktos, kas piemēroti slaidiem." },
+                    { body: "Pārveido šo tekstu jautājumu un atbilžu formātā." }
+                ]
+            }
+        },
+        "Idejas, radošums, koncepcijas": {
+            darbibas: {
+                "Izdomāt jaunas idejas": [
+                    { body: "Izdomā vairākas jaunas idejas par šo tēmu, neierobežojot sevi." },
+                    { body: "Ģenerē radošas koncepcijas dotajai problēmai un paskaidro tās." },
+                    { body: "Piedāvā jaunas idejas, kas risina šo uzdevumu no atšķirīgiem skatpunktiem." },
+                    { body: "Izstrādā vairākas koncepcijas un norādi, ar ko katra atšķiras." },
+                    { body: "Izdomā oriģinālas idejas, kuras varētu praktiski īstenot." }
+                ],
+                "Strukturēta ģenerēšana": [
+                    { body: "Veic brīvu ideju ģenerēšanu par šo tēmu, uzskaitot visas domas." },
+                    { body: "Izmanto strukturētu ideju ģenerēšanu un sadali idejas pa kategorijām." },
+                    { body: "Ģenerē idejas, izmantojot jautājumus 'kas', 'kā', 'kāpēc' un 'kam'." },
+                    { body: "Veic ideju ģenerēšanu noteiktā struktūrā (plusi, mīnusi, iespējas)." },
+                    { body: "Ģenerē idejas soli pa solim, pakāpeniski paplašinot risinājumu klāstu." }
+                ],
+                "Scenāriji un stāsti": [
+                    { body: "Uzraksti īsu stāstu par doto tēmu ar skaidru sākumu un noslēgumu." },
+                    { body: "Izveido scenārija melnrakstu video vai prezentācijai par šo tēmu." },
+                    { body: "Izdomā vairākus nosaukumu variantus šim projektam vai produktam." },
+                    { body: "Izveido saukļus, kas īsi un trāpīgi atspoguļo galveno ideju." },
+                    { body: "Uzraksti radošu scenāriju ar dialogiem, pielāgotu auditorijai." }
+                ],
+                "Problēmu risināšana": [
+                    { body: "Analizē šo problēmu un piedāvā vairākus iespējamos risināšanas variantus." },
+                    { body: "Piedāvā dažādas pieejas šīs problēmas risināšanai un apraksti tās." },
+                    { body: "Izstrādā vairākus risinājumu scenārijus, ņemot vērā ierobežojumus." },
+                    { body: "Piedāvā gan īstermiņa, gan ilgtermiņa risinājumus šai problēmai." },
+                    { body: "Piedāvā alternatīvus risinājumus un norādi to ieguvumus un riskus." }
+                ],
+                "Vērtēt idejas": [
+                    { body: "Izvērtē katru no šīm idejām, norādot plusus, mīnusus un riskus." },
+                    { body: "Salīdzini idejas, analizējot to priekšrocības, trūkumus un riskus." },
+                    { body: "Veic ideju kritisku izvērtējumu, sadalot novērojumus kategorijās." },
+                    { body: "Izvērtē piedāvātās idejas no praktiskā un stratēģiskā skatpunkta." },
+                    { body: "Sagatavo strukturētu ideju novērtējumu ar atsevišķām sadaļām." }
+                ],
+                "Pielāgot biznesam": [
+                    { body: "Pielāgo šīs radošās idejas praktiskai ieviešanai reālā situācijā." },
+                    { body: "Pārveido radošās koncepcijas tā, lai tās atbilstu biznesa mērķiem." },
+                    { body: "Izvērtē radošās idejas un pielāgo tās komerciālai izmantošanai." },
+                    { body: "Pielāgo idejas, ņemot vērā budžetu, mērķauditoriju un iespējas." },
+                    { body: "Pārstrādā radošās idejas par konkrētiem, īstenojamiem soļiem." }
+                ]
+            }
+        },
+        "Programmēšana un algoritmi": {
+            darbibas: {
+                "Algoritmiska domāšana": [
+                    { body: "Sadalī šo uzdevumu skaidros soļos un izveido soli pa solim algoritmu." },
+                    { body: "Apraksti loģisku darbību secību šīs problēmas risināšanai." },
+                    { body: "Izveido pseido-kodu vai plūsmas aprakstu, kas parāda risinājumu." },
+                    { body: "Atrisini šo problēmu, skaidrojot domāšanas gaitu pa posmiem." },
+                    { body: "Izstrādā lēmumu koku vai noteikumu kopumu rīcības izvēlei." }
+                ],
+                "Rakstīt un labot kodu": [
+                    { body: "Uzraksti programmas kodu šīs problēmas risināšanai norādītajā valodā." },
+                    { body: "Izlabo šo koda fragmentu un paskaidro, kāpēc izmaiņas ir nepieciešamas." },
+                    { body: "Paskaidro šo koda piemēru soli pa solim, izmantojot saprotamu valodu." },
+                    { body: "Pārraksti šo kodu efektīvākā vai lasāmākā veidā." },
+                    { body: "Pielāgo šo kodu citai programmēšanas valodai." }
+                ],
+                "Datu formāti": [
+                    { body: "Saglabā šo informāciju JSON formātā ar skaidriem atslēgu nosaukumiem." },
+                    { body: "Izvadi datus CSV formātā bez papildu paskaidrojumiem." },
+                    { body: "Pārveido šo informāciju Markdown formātā, saglabājot struktūru." },
+                    { body: "Noformē datus tā, lai tos var tieši importēt Excel failā." },
+                    { body: "Izvadi informāciju formātā, kas piemērota automatizētai apstrādei." }
+                ],
+                "Aprēķini un analīze": [
+                    { body: "Veic nepieciešamos aprēķinus, pamatojoties uz sniegtajiem datiem." },
+                    { body: "Analizē datus un apraksti galvenās tendences un sakarības." },
+                    { body: "Aprēķini kopsummas, vidējās vērtības un procentuālās izmaiņas." },
+                    { body: "Veic datu analīzi un izcel būtiskākos secinājumus." },
+                    { body: "Izvērtē datus, aprēķini galvenos rādītājus un paskaidro tos." }
+                ],
+                "Vizualizēt datus": [
+                    { body: "Attēlo šos datus tabulas veidā ar skaidri nosauktām kolonnām." },
+                    { body: "Izveido tabulu, kas apkopo galvenos rādītājus un to vērtības." },
+                    { body: "Vizualizē šos datus grafikā un paskaidro, ko tas parāda." },
+                    { body: "Izveido stabiņu vai līniju grafiku, lai parādītu izmaiņas laika gaitā." },
+                    { body: "Attēlo datus gan tabulā, gan grafikā vieglai salīdzināšanai." }
+                ],
+                "Skaidrot koda kļūdas": [
+                    { body: "Izanalizē šo koda fragmentu un paskaidro kļūdas un to cēloņus." },
+                    { body: "Skaidro, kāpēc šis kods nedarbojas kā paredzēts, un piedāvā labojumus." },
+                    { body: "Identificē koda neefektivitātes un paskaidro optimizāciju." },
+                    { body: "Pārskati kodu un norādi vietas uzlabojumiem." },
+                    { body: "Paskaidro koda kļūdas soli pa solim un ierosini risinājumu." }
+                ],
+                "Ģenerēt failus": [
+                    { body: "Izveido failu ar šo saturu PDF formātā." },
+                    { body: "Ģenerē Excel failu ar dotajiem datiem un saglabā to." },
+                    { body: "Izveido Word dokumentu, kurā ir noformēts šis teksts." },
+                    { body: "Ģenerē CSV failu no šiem datiem bez paskaidrojumiem." },
+                    { body: "Izveido lejupielādējamu failu norādītajā formātā." }
+                ]
+            }
+        },
+        "Attēli, audio, video": {
+            darbibas: {
+                "Ģenerēt attēlus": [
+                    { body: "Izveido attēlu, kas vizuāli attēlo šo ideju vai koncepciju." },
+                    { body: "Ģenerē ilustrāciju ar šādu aprakstu: [ievieto aprakstu]." },
+                    { body: "Izveido reālistisku attēlu, kas parāda aprakstīto situāciju." },
+                    { body: "Ģenerē stilizētu attēlu noteiktā mākslinieciskā stilā." },
+                    { body: "Izveido attēlu ar norādītām krāsām, noskaņu un objektiem." }
+                ],
+                "Nolasīt tekstu no attēla": [
+                    { body: "Nolasi visu tekstu no pievienotā attēla un atgriez to teksta formā." },
+                    { body: "Izgūsti tekstu no attēla un saglabā oriģinālo formatējumu." },
+                    { body: "Nolasi tekstu no attēla un izcel galvenos punktus." },
+                    { body: "Izgūsti tekstu no attēla un norādi neskaidrās daļas." },
+                    { body: "Nolasi tekstu no attēla un pārveido to rediģējamā formātā." }
+                ],
+                "Atpazīt objektus attēlos": [
+                    { body: "Identificē visus redzamos objektus šajā attēlā un apraksti tos." },
+                    { body: "Atpazīsti attēlā redzamo ainu un paskaidro, kas tajā notiek." },
+                    { body: "Uzskaiti galvenos elementus attēlā un to savstarpējās attiecības." },
+                    { body: "Atpazīsti attēlā esošos objektus un sadali tos kategorijās." },
+                    { body: "Apraksti attēla saturu, koncentrējoties uz detaļām." }
+                ],
+                "Uzvedne pēc attēla": [
+                    { body: "Izveido detalizētu teksta uzvedni šim attēlam atkārtotai ģenerēšanai." },
+                    { body: "Pamatojoties uz šo attēlu, uzraksti promtu attēlu ģenerēšanas modelim." },
+                    { body: "Apraksti attēla vizuālos elementus, stilu un krāsas promta formā." },
+                    { body: "Izveido īsu, bet precīzu promtu šī attēla galvenajai idejai." },
+                    { body: "Pārvērt šo attēlu strukturētā promtā ar visiem parametriem." }
+                ],
+                "Audio apstrāde": [
+                    { body: "Transkribē šo audio failu tekstā, saglabājot runātāju secību." },
+                    { body: "Izgūsti tekstu no audio ieraksta un izlabojiet valodas kļūdas." },
+                    { body: "Transkribē audio failu un izcel galvenās tēmas vai atslēgvārdus." },
+                    { body: "Pārveido šo audio ierakstu strukturētā teksta formā." },
+                    { body: "Transkribē audio failu un sagatavo īsu kopsavilkumu." }
+                ],
+                "Balss dialogs": [
+                    { body: "Uzsāc dialogu balss režīmā un uzdod man jautājumus par šo tēmu." },
+                    { body: "Veido sarunu balss režīmā, atbildot īsi un skaidri." },
+                    { body: "Simulē dialogu balss režīmā starp mani un klientu." },
+                    { body: "Veido dabisku balss dialogu ar uzsvaru uz skaidru izrunu." },
+                    { body: "Turpini sarunu balss režīmā, pielāgojot atbildes jautājumiem." }
+                ],
+                "Video koncepcijas": [
+                    { body: "Izveido video koncepciju par šo tēmu, aprakstot ideju un mērķi." },
+                    { body: "Uzraksti īsu video scenāriju ar kadru aprakstiem." },
+                    { body: "Izstrādā video struktūru, norādot visas daļas." },
+                    { body: "Izdomā vairākas video idejas realizācijai ar ārējiem rīkiem." },
+                    { body: "Apraksti video kadrējumu un noskaņu (bez faila ģenerēšanas)." }
+                ],
+                "Analizēt video": [
+                    { body: "Izanalizē augšupielādēto video un sagatavo kopsavilkumu par saturu." },
+                    { body: "Nosaki galvenās tēmas un notikumus augšupielādētajā video." },
+                    { body: "Analizē video secību un paskaidro galveno vēstījumu." },
+                    { body: "Izvērtē augšupielādētā video struktūru, tempu un vizuāļus." },
+                    { body: "No augšupielādētā video izcel būtiskākos momentus." }
+                ]
+            }
+        },
+        "Konteksts, projekti, asistēšana": {
+            darbibas: {
+                "Sarunas konteksts": [
+                    { body: "Ņem vērā visu, ko esmu teicis šajā sarunā, un turpini atbildi." },
+                    { body: "Balstoties uz mūsu iepriekšējo sarunu, precizē šo informāciju." },
+                    { body: "Atceries iepriekš pieņemtos nosacījumus un piemēro tos atbildei." },
+                    { body: "Izmanto iepriekš apspriesto kontekstu saistītai atbildei." },
+                    { body: "Turpini risināt uzdevumu no vietas, kur apstājāmies." }
+                ],
+                "Kompleksi projekti": [
+                    { body: "Sāksim šo projektu soli pa solim. Vispirms definēsim mērķi." },
+                    { body: "Izveido projekta plānu pa posmiem un piedāvā sākt ar pirmo soli." },
+                    { body: "Sadali šo projektu loģiskos soļos un izpildām tos secīgi." },
+                    { body: "Veidosim projektu iteratīvi. Piedāvā nākamo soli un gaidi apstiprinājumu." },
+                    { body: "Palīdzi izstrādāt projektu pakāpeniski, precizējot prasības." }
+                ],
+                "Canvas režīms": [
+                    { body: "Atver šo uzdevumu Canvas režīmā un izveido jaunu dokumentu." },
+                    { body: "Izvieto šo tekstu Canvas dokumentā turpmākai rediģēšanai." },
+                    { body: "Strādā Canvas režīmā un soli pa solim uzlabo šo dokumentu." },
+                    { body: "Izveido Canvas dokumentu koda izstrādei ar koda struktūru." },
+                    { body: "Turpini darbu Canvas režīmā, saglabājot izmaiņas." }
+                ],
+                "Pielāgoti asistenti": [
+                    { body: "Palīdzi man izveidot pielāgotu asistentu šim uzdevumam." },
+                    { body: "Definē pielāgota asistenta mērķi, funkcijas un robežas." },
+                    { body: "Izveido instrukciju kopumu manam pielāgotajam asistentam." },
+                    { body: "Palīdzi konfigurēt pielāgotu asistentu pēc manām vajadzībām." },
+                    { body: "Paskaidro, kā izmantot šo pielāgoto asistentu ikdienas darbā." }
+                ],
+                "Aģenta režīms": [
+                    { body: "Plāno darbības aģenta režīmā, bet neizpildi bez apstiprinājuma." },
+                    { body: "Apraksti soli pa solim, kā izmantot ārējo programmu, saskaņojot ar mani." },
+                    { body: "Darbojies aģenta režīmā tikai kā konsultants un darbību plānotājs." },
+                    { body: "Izveido kontrolētu darbību secību un prasi apstiprinājumu." },
+                    { body: "Piedāvā aģenta režīma risinājumu ar lietotāja kontroli." }
+                ],
+                "Sekot projekta loģikai": [
+                    { body: "Balstoties uz iepriekš pieņemtajiem lēmumiem, turpini darbu." },
+                    { body: "Pārbaudi, vai jaunais priekšlikums atbilst projekta loģikai." },
+                    { body: "Ņem vērā iepriekš apstiprinātās prasības un pielāgo risinājumu." },
+                    { body: "Apkopojot pieņemtos lēmumus, piedāvā nākamos soļus." },
+                    { body: "Turpini projektu, nemainot saskaņotos pieņēmumus." }
+                ]
+            }
+        },
+        "Organizēšana un palīgi": {
+            darbibas: {
+                "Atgādinājumi": [
+                    { body: "Izveido atgādinājumu par šo uzdevumu norādītajā laikā." },
+                    { body: "Pievieno kalendāra ierakstu ar nosaukumu un aprakstu." },
+                    { body: "Uzstādi regulāru atgādinājumu šim notikumam katru nedēļu." },
+                    { body: "Izveido kalendāra ierakstu un iestati paziņojumu pirms notikuma." },
+                    { body: "Izmanto atbalstīto rīku atgādinājumam un apstiprini saglabāšanu." }
+                ],
+                "Konsultants/mentors": [
+                    { body: "Darbojies kā konsultants un sniedz profesionālus ieteikumus." },
+                    { body: "Uzņemies trenera lomu un palīdzi uzlabot prasmes šajā jomā." },
+                    { body: "Esi mans mentors un palīdzi pieņemt pārdomātus lēmumus." },
+                    { body: "Sniedz konstruktīvu atgriezenisko saiti un ieteikumus rīcībai." },
+                    { body: "Palīdzi man attīstīties šajā jomā, uzdodot jautājumus." }
+                ],
+                "Mērķi un ceļakartes": [
+                    { body: "Palīdzi man definēt skaidrus mērķus un sadalīt tos uzdevumos." },
+                    { body: "Izveido ceļakarti šim projektam ar posmiem un termiņiem." },
+                    { body: "Sakārto mērķus un uzdevumus prioritārā secībā." },
+                    { body: "Izstrādā rīcības plānu mērķu sasniegšanai." },
+                    { body: "Plāno mērķus pa soļiem, ņemot vērā resursus." }
+                ],
+                "Mācību palīgs": [
+                    { body: "Izskaidro šo tēmu soli pa solim un pievieno piemērus." },
+                    { body: "Darbojies kā mācību palīgs un sagatavo īsus testus." },
+                    { body: "Izskaidro jēdzienu vienkārši un piedāvā uzdevumus praksei." },
+                    { body: "Sagatavo mācību materiālu ar skaidrojumiem un jautājumiem." },
+                    { body: "Palīdzi apgūt tēmu, kombinējot skaidrojumus un piemērus." }
+                ],
+                "Simulēt sarunas": [
+                    { body: "Simulē darba interviju un uzdod man jautājumus kā darba devējs." },
+                    { body: "Izspēlē klienta un konsultanta sarunu par šo pakalpojumu." },
+                    { body: "Simulē sarežģītu sarunu ar klientu un palīdzi trenēt atbildes." },
+                    { body: "Izveido dialoga simulāciju ar reālistiskām atbildēm." },
+                    { body: "Spēlē lomu spēli, kur tu esi klients, bet es uzņēmums." }
+                ]
+            }
+        },
+        "Paškontrole un drošība": {
+            darbibas: {
+                "Atzīt un labot kļūdas": [
+                    { body: "Pārbaudi savu iepriekšējo atbildi un atzīsti, ja tajā ir kļūdas." },
+                    { body: "Identificē kļūdas savā skaidrojumā un sniedz labotu versiju." },
+                    { body: "Izvērtē iepriekš sniegto informāciju un izlabo nepareizo." },
+                    { body: "Ja esi pieļāvis kļūdas, paskaidro, kur tās radās." },
+                    { body: "Pārskati savas atbildes un veic labojumus, ja dati nav korekti." }
+                ],
+                "Drošība un ētika": [
+                    { body: "Pārbaudi šo uzdevumu un atbildi tikai drošības un ētikas robežās." },
+                    { body: "Sniedz atbildi, neiekļaujot kaitīgu vai nelikumīgu informāciju." },
+                    { body: "Izvērtē pieprasījumu no drošības viedokļa un paskaidro robežas." },
+                    { body: "Atbildi uz šo jautājumu atbildīgi, ievērojot likumus." },
+                    { body: "Ja uzdevumu nevar izpildīt, paskaidro iemeslu un piedāvā alternatīvu." }
+                ],
+                "Negarantēt patiesību": [
+                    { body: "Sniedz atbildi, norādot, ka informācija nav pārbaudīta avotos." },
+                    { body: "Atbildi uz jautājumu, piebilstot, ka nevar garantēt precizitāti." },
+                    { body: "Sniedz provizorisku skaidrojumu, kas var neatbilst realitātei." },
+                    { body: "Izklāsti informāciju ar atrunu par iespējamu neprecizitāti." },
+                    { body: "Atbildi, uzsverot, ka informācija ir orientējoša." }
+                ],
+                "Slēgtas sistēmas": [
+                    { body: "Sniegt tikai vispārīgu skaidrojumu bez piekļuves slēgtiem datiem." },
+                    { body: "Atbildi uz jautājumu, nepiekļūstot autentificētām sistēmām." },
+                    { body: "Izskaidro procesu, neizmantojot piekļuvi aizsargātām sistēmām." },
+                    { body: "Sniedz konsultatīvu atbildi, balstoties tikai uz publisku info." },
+                    { body: "Paskaidro ierobežojumu un piedāvā drošu alternatīvu piekļuvei." }
+                ],
+                "Autonomija": [
+                    { body: "Veic šo uzdevumu tikai ar manu apstiprinājumu katrā solī." },
+                    { body: "Pirms jebkādu darbību veikšanas apraksti plānu saskaņošanai." },
+                    { body: "Darbojies kā asistents, nevis kā autonoms izpildītājs." },
+                    { body: "Piedāvā nākamo soli un turpini darbu tikai pēc piekrišanas." },
+                    { body: "Veic uzdevumu kontrolētā režīmā ar lietotāja pilnu kontroli." }
+                ]
+            }
+        }
+    };
+
+    function toggleSound() { isSoundEnabled = !isSoundEnabled; document.getElementById('soundToggle').innerText = isSoundEnabled ? '🔊' : '🔇'; }
+    
+    function toggleTheme() {
+        const body = document.body;
+        const newTheme = body.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        body.setAttribute('data-theme', newTheme);
+        document.getElementById('themeToggle').innerText = newTheme === 'light' ? '🌙' : '☀️';
+        playClick(1500, 0.05);
+    }
+
+    function playClick(freq, dur) {
+        if (!isSoundEnabled) return;
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + dur);
+    }
+
+    function initApp() {
+        const tSelect = document.getElementById('topicSelect');
+        Object.keys(data).forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = t; opt.innerText = t;
+            tSelect.appendChild(opt);
+        });
+        updateActions();
+    }
+
+    function updateActions() {
+        const tKey = document.getElementById('topicSelect').value;
+        const aSelect = document.getElementById('actionSelect');
+        aSelect.innerHTML = '';
+        Object.keys(data[tKey].darbibas).forEach(a => {
+            const opt = document.createElement('option');
+            opt.value = a; opt.innerText = a;
+            aSelect.appendChild(opt);
+        });
+        displayPrompts();
+    }
+
+    function displayPrompts() {
+        const tKey = document.getElementById('topicSelect').value;
+        const aKey = document.getElementById('actionSelect').value;
+        const container = document.getElementById('promptContainer');
+        container.innerHTML = '';
+        
+        data[tKey].darbibas[aKey].forEach((p, i) => {
+            const row = document.createElement('div');
+            row.className = 'prompt-row';
+            row.innerHTML = `
+                <div class="prompt-num-fixed">${i+1}.</div>
+                <div class="prompt-item">
+                    <span class="copy-feedback">Kopēts!</span>
+                    <button class="copy-btn" onclick="copyText(this, \`${p.body.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">
+                        <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                    </button>
+                    <div class="prompt-content">${p.body}</div>
+                    <div class="rating">
+                        <span class="star" onclick="rate(this, 1)">★</span>
+                        <span class="star" onclick="rate(this, 2)">★</span>
+                        <span class="star" onclick="rate(this, 3)">★</span>
+                    </div>
+                </div>`;
+            row.querySelector('.prompt-item').onclick = function() {
+                document.querySelectorAll('.prompt-item').forEach(el => el.classList.remove('active'));
+                this.classList.add('active');
+                playClick(2000, 0.03);
+            };
+            container.appendChild(row);
+        });
+    }
+
+    function copyText(btn, txt) {
+        navigator.clipboard.writeText(txt).then(() => {
+            const fb = btn.parentElement.querySelector('.copy-feedback');
+            fb.style.opacity = '1';
+            playClick(2500, 0.05);
+            setTimeout(() => fb.style.opacity = '0', 1000);
+        });
+    }
+
+    function rate(el, n) {
+        const stars = el.parentElement.querySelectorAll('.star');
+        stars.forEach((s, i) => s.classList.toggle('filled', i < n));
+        event.stopPropagation();
+    }
+
+    window.onload = initApp;
+</script>
+</body>
+</html>
